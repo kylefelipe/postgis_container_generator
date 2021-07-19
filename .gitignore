@@ -3,7 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,linux,data
 
 data/
-
+conf/.pgpass
 ### Linux ###
 *~
 
