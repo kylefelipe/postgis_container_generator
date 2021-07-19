@@ -1,4 +1,4 @@
-# Meu Postgis
+# Gerador de container Postgis
 
 Esse script foi criado para gerar um container Docker com o [Postgis](https://postgis.net) 
 usando a imagem oficial. O difierencial é que já gera um arquivo pg_pass, evitando
