@@ -19,9 +19,10 @@ pg_user="postgres"
 remove_data="n"
 remove_container="n"
 pg_pass="s"
-data_dir="$(pwd -P)/data"
+data_dir="$(pwd -P)"
 script_dir="$(pwd -P)/scripts"
 conf_dir="$(pwd -P)/conf"
+postgis_version="11-2.5"
 
 usage() {
     echo "Uso:  sudo create_postgis.sh [OPÇÃO]
@@ -32,19 +33,22 @@ usage() {
         [ -C | --config-dir path path to config folder to map to container ]
         [ -d | --database database name ]
         [ -D | --data-dir path to folder data to map to container ]
+        [ -g | --gis-version string postgis container version tag to use, link in the end of this help ]
         [ -h | --hostname hostname hostname/ip to expose at host ]
         [ -p | --port database port ]
         [ -P | --password database password ]
         [ -s | --script-dir path path to script folder to map to container ]
         [ -U | --user database user (root) ]
     
-    Essas opções não precisam de argumentos
+    Essas opções não precisam de argumentos:
+
         [ --clear_data erases data folder ]
         [ --no_pgpass skip pgpass config]
         [ --rm_container remove container before create ]
         [ --help exibe esse help ]
         [ --version informa a versão e sai ]"
     echo ""
+    echo "Cheque as tags que podem ser utilizadas no postgis em <https://hub.docker.com/r/postgis/postgis/tags>"
     echo "Página do repositório desse script: <$REPOLINK>"
     echo "Envie os erros e sugestões para <$REPOLINK/issues>"
     echo "Se foi útil, deixe uma estrelinha"
@@ -92,6 +96,10 @@ do
     ;;
     -D | --data-dir)
         data_dir="$2"
+        shift 2
+    ;;
+    -g | --gis-version)
+        postgis_version="$2"
         shift 2
     ;;
     -h | --hostname)
@@ -145,9 +153,11 @@ do
     esac
 done
 
-if [ "$remove_data" = "s" ]; then
+if [ "$remove_data" = "s" ] && [ -d "$data_dir/data" ]; then
     echo "Removendo a pasta data."
-    rm -rf data
+    rm -rf "$data_dir/data"
+else
+    echo "Pasta $data_dir/data inexistente!"
 fi
 
 if [ "$remove_container" = "s" ]; then
@@ -155,16 +165,17 @@ if [ "$remove_container" = "s" ]; then
     docker container rm -f "$container_name"
 fi
 
-if [ ! -r ./data ] && [ ! -w ./data ] && [ ! -x ./data ]; then
-    echo "Usuário não tem permissão para alterar a pasta ./data"
+if [ ! -r "$data_dir/data" ] && [ ! -w "$data_dir/data" ] && [ ! -x "$data_dir/data" ]; then
+    echo "Usuário não tem permissão para alterar a pasta $data_dir/data"
     echo "Considere executar como super usuário!"
     exit 1
 fi
 
-if [ ! -d "./data" ]; then
-    echo "Criando a pasta /data"
-    mkdir ./data
-    data_dir="./data"
+if [ ! -d "$data_dir/data" ]; then
+    echo "Criando a pasta /data dentro do diretório $data_dir"
+    mkdir -p "$data_dir/data"
+    echo "Pronto!"
+
 fi
 
 if [ "$VALID_ARGUMENTS" = "0" ]
@@ -173,7 +184,7 @@ then
     if [ -n "$existing_container" ] && [ "$remove_container" = "n" ]; then
         echo "Já existe um container com o nome $container_name."
         echo "Por favor, especifique um novo nome de container ou remova o já exstente"
-        echo "ou use a opção --rm_container, que remove um container pré existente de mesmo nome"
+        echo "ou use a opção --rm_container, para remover um container pré existente de mesmo nome"
         usage
     fi
 
@@ -185,7 +196,7 @@ then
     echo ""
     echo "Criando o container $container_name em modo daemon."
     echo ""
-    echo "Imagem Postgis utilizada: postgis/postgis:11-2.5"
+    echo "Imagem Postgis utilizada: postgis/postgis:$postgis_version"
     echo "https://hub.docker.com/r/postgis/postgis"
 
     sudo docker run -d \
@@ -196,12 +207,12 @@ then
         -e POSTGRES_DB="$database" \
         -e PGDATA=/var/lib/postgresql/data/pgdata \
         --ipc=host \
-        -v "$data_dir":/data \
+        -v "$data_dir/data":/data \
         -v "$script_dir":/scripts \
         -v "$script_dir"/10_postgis.sh:/docker-entrypoint-initdb.d/10_postgis.sh \
-        -v "$cconf_dir"/.pgpass:/root/.pgpass \
+        -v "$conf_dir"/.pgpass:/root/.pgpass \
         -v "$data":/var/lib/postgresql/data/pgdata \
-        postgis/postgis:11-2.5
+        postgis/postgis:"$postgis_version"
     
     echo ""
     if [ "$(docker ps -q -f name=$container_name -f status=running)"  == "" ]; then

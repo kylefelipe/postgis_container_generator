@@ -39,9 +39,10 @@ As seguinte opções podem ser passadas:
 > Essas opções anteriores não precisam de parâmetros.
 
 - `-c | --container string` > Nome do container a ser criado.  
-- `-C | --config-dir path` > caminho para a pasta conf a ser mapeada para o contaner.  
+- `-C | --config-dir path` > Caminho para a pasta conf a ser mapeada para o contaner.  
 - `-d | --database string` > Nome do banco a ser criado dentro do container.  
-- `-D | --data-dir path` > caminho para a pasta data a ser mapeada para o contaner.  
+- `-D | --data-dir path` > Caminho para o diretório onde a pasta data será criada (caso não exista) e mapeada para o contaner.  
+- `-g | --gis-version string` > Tag da versão do container do postgis a ser usada.  
 - `-p | --port number` > Número da porta do host que irá receber a interna do banco.  
 - `-P | --password string` > Senha do usuário Root.  
 - `-s | --script-dir path` > Caminho da pasta que contém o script a ser executado no banco.  
