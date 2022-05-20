@@ -3,10 +3,13 @@
 # Author: Kyle Felipe
 # E-mail: kylefelipe at gmail.com
 # data: 18/07/2021
+# Ùltima atualização: 20/05/2022
 # Script feito para criar um container com postgis e com a pasta data em um
 # local específico, a princípio é uma pasta data no diretório atual
 # É intenção futura poder escolher via opções onde colocar a pasta data.
 
+REPOLINK="https://github.com/kylefelipe/postgis_container_generator"
+version='0.1.0'
 database="meupostgis"
 hostname="localhost"
 container_name="meus-dados-geograficos"
@@ -16,24 +19,53 @@ pg_user="postgres"
 remove_data="n"
 remove_container="n"
 pg_pass="s"
+data_dir="$(pwd -P)/data"
+script_dir="$(pwd -P)/scripts"
+conf_dir="$(pwd -P)/conf"
 
 usage() {
-    echo "Usage: [ -d | --database database name ] [ -p | --port database port ]
-                 [ -U | --user database user (root) ] [ -P | --password database password ]
-                 [ -c | --container container name ] [ --no_pgpass skip pgpass config]
-                 [ --clear_data erases data folder ] [ --rm_container remove container before create ]
-                 [ --help exibe esse help ]"
+    echo "Uso:  sudo create_postgis.sh [OPÇÃO]
+
+    Essas opções possuem argumentos obrigatórios:
+
+        [ -c | --container container name ]
+        [ -C | --config-dir path path to config folder to map to container ]
+        [ -d | --database database name ]
+        [ -D | --data-dir path to folder data to map to container ]
+        [ -h | --hostname hostname hostname/ip to expose at host ]
+        [ -p | --port database port ]
+        [ -P | --password database password ]
+        [ -s | --script-dir path path to script folder to map to container ]
+        [ -U | --user database user (root) ]
+    
+    Essas opções não precisam de argumentos
+        [ --clear_data erases data folder ]
+        [ --no_pgpass skip pgpass config]
+        [ --rm_container remove container before create ]
+        [ --help exibe esse help ]
+        [ --version informa a versão e sai ]"
+    echo ""
+    echo "Página do repositório desse script: <$REPOLINK>"
+    echo "Envie os erros e sugestões para <$REPOLINK/issues>"
+    echo "Se foi útil, deixe uma estrelinha"
+    echo "LLP _\\\\//"
+    echo "<www.kylefelie.com>"
     exit 2
 }
 
 use_pgpass() {
-    echo "Criando aquivo .pgpas na pasta ./conf"
-    echo "localhost:5432:$database:$pg_user:$pg_password" > ./conf/.pgpass
-    chmod 0600 ./conf/.pgpass
+    echo "Criando aquivo .pgpas na pasta $conf_dir"
+    echo "localhost:5432:$database:$pg_user:$pg_password" > $conf_dir/.pgpass
+    chmod 0600 $conf_dir/.pgpass
 }
 
-PARSED_ARGUMENTS=$(getopt -a -n argument -o h:d:f:p:P:U: \
-                    --long hostname:,database:,container_name:,port:,password:,user:,clear_data,rm_container,help,no_pgpass, -- "$@")
+version() {
+    echo $version
+    exit 2
+}
+
+PARSED_ARGUMENTS=$(getopt -a -n argument -o h:c:C:d:D:f:p:P:U:v: \
+                    --long container_name:,config-dir:,database:,data-dir:,hostname:,port:,password:,script-dir:,user:,clear_data,rm_container,help,no_pgpass,version -- "$@")
 
 VALID_ARGUMENTS=$?
 
@@ -46,16 +78,24 @@ eval set -- "$PARSED_ARGUMENTS"
 while :
 do
     case "$1" in
-    -h | --hostname)
-        hostname="$2"
+    -c | --container)
+        container_name="$2"
+        shift 2
+    ;;
+    -C | --config-dir)
+        config_path="$2"
         shift 2
     ;;
     -d | --database)
         database="$2"
         shift 2
     ;;
-    -c | --container)
-        container_name="$2"
+    -D | --data-dir)
+        data_dir="$2"
+        shift 2
+    ;;
+    -h | --hostname)
+        hostname="$2"
         shift 2
     ;;
     -p | --port)
@@ -64,6 +104,10 @@ do
     ;;
     -P | --password)
         pg_password="$2"
+        shift 2
+    ;;
+    -s | --script-dir)
+        script_dir="$2"
         shift 2
     ;;
     -U | --user)
@@ -84,6 +128,10 @@ do
     ;;
     --help)
         usage
+        shift 2
+    ;;
+    -v | --version)
+        version
         shift 2
     ;;
     --)
@@ -116,6 +164,7 @@ fi
 if [ ! -d "./data" ]; then
     echo "Criando a pasta /data"
     mkdir ./data
+    data_dir="./data"
 fi
 
 if [ "$VALID_ARGUMENTS" = "0" ]
@@ -147,11 +196,11 @@ then
         -e POSTGRES_DB="$database" \
         -e PGDATA=/var/lib/postgresql/data/pgdata \
         --ipc=host \
-        -v "$PWD"/data:/data \
-        -v "$PWD"/scripts:/scripts \
-        -v "$PWD"/scripts/10_postgis.sh:/docker-entrypoint-initdb.d/10_postgis.sh \
-        -v "$PWD"/conf/.pgpass:/root/.pgpass \
-        -v "$PWD"/data:/var/lib/postgresql/data/pgdata \
+        -v "$data_dir":/data \
+        -v "$script_dir":/scripts \
+        -v "$script_dir"/10_postgis.sh:/docker-entrypoint-initdb.d/10_postgis.sh \
+        -v "$cconf_dir"/.pgpass:/root/.pgpass \
+        -v "$data":/var/lib/postgresql/data/pgdata \
         postgis/postgis:11-2.5
     
     echo ""
