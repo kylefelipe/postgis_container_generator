@@ -14,6 +14,9 @@ As opções padrões do script são:
 - Senha do root = postgres;  
 - Recria a pasta data: não;  
 - Remove o container caso exista: não;  
+- Pasta data será criada no diretório atual desse script;  
+- Pasta conf = pasta presente nesse repositório;  
+- Pasta scripts = pasta presente nesse repositório;  
 
 Esses padrões podem ser configurados conforme as opções que estarão no help
 
@@ -23,7 +26,7 @@ Esses padrões podem ser configurados conforme as opções que estarão no help
 ./create_postgis.sh
 ```
 
-Talvêz seja necessário rodar o script como super user para fazer algumas modificações.
+É necessário rodar o script como super user para fazer algumas modificações.
 
 ## Help
 
@@ -35,11 +38,14 @@ As seguinte opções podem ser passadas:
 
 > Essas opções anteriores não precisam de parâmetros.
 
-- `-d | --database string` > Nome do banco a ser criado dentro do container.
-- `-p | --port number` > Número da porta do host que irá receber a interna do banco.
-- `-U | --user string` > Nome do usuário root.
-- `-P | --password string` > Senha do usuário Root.
-- `-c | --container string` > Nome do container a ser criado.
+- `-c | --container string` > Nome do container a ser criado.  
+- `-C | --config-dir path` > caminho para a pasta conf a ser mapeada para o contaner.  
+- `-d | --database string` > Nome do banco a ser criado dentro do container.  
+- `-D | --data-dir path` > caminho para a pasta data a ser mapeada para o contaner.  
+- `-p | --port number` > Número da porta do host que irá receber a interna do banco.  
+- `-P | --password string` > Senha do usuário Root.  
+- `-s | --script-dir path` > Caminho da pasta que contém o script a ser executado no banco.  
+- `-U | --user string` > Nome do usuário root.  
 
 ## Pasta scripts
 
@@ -50,3 +56,7 @@ Não é necessário reiniciar o container após inserir arquivos nessa pasta.
 
 É usado para criar o banco e as extensões. caso queira criar uma extensão a mais, basta alterar esse arquivo.
 Ele é mapeado para dentro do entrypoint do container para ser executado.
+
+## Executando o arquivo de qualquer diretório
+
+Basta adicionar um link na pasta usr/bin que estará disponível para rodar do terminal.
