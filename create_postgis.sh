@@ -53,7 +53,7 @@ usage() {
     echo "Envie os erros e sugestões para <$REPOLINK/issues>"
     echo "Se foi útil, deixe uma estrelinha"
     echo "LLP _\\\\//"
-    echo "<www.kylefelie.com>"
+    echo "<www.kylefelipe.com>"
     exit 2
 }
 
@@ -165,18 +165,19 @@ if [ "$remove_container" = "s" ]; then
     docker container rm -f "$container_name"
 fi
 
-if [ ! -r "$data_dir/data" ] && [ ! -w "$data_dir/data" ] && [ ! -x "$data_dir/data" ]; then
-    echo "Usuário não tem permissão para alterar a pasta $data_dir/data"
-    echo "Considere executar como super usuário!"
-    exit 1
-fi
-
 if [ ! -d "$data_dir/data" ]; then
     echo "Criando a pasta /data dentro do diretório $data_dir"
     mkdir -p "$data_dir/data"
     echo "Pronto!"
 
 fi
+
+if [ -d "$data_dir/data" ] && [ ! -w "$data_dir/data" ] && [ ! -x "$data_dir/data" ]; then
+    echo "Usuário não tem permissão para alterar a pasta $data_dir/data"
+    echo "Considere executar como super usuário!"
+    exit 1
+fi
+
 
 if [ "$VALID_ARGUMENTS" = "0" ]
 then
@@ -223,7 +224,7 @@ then
         done
     fi
 
-    sleep 5
+    sleep 10
 
     echo ""
     echo "PostgreSQL Version:"
@@ -236,7 +237,7 @@ then
     echo ""
     echo "Container criado com sucesso!"
     echo "Para acessar basta conectar em:"
-    echo "localhost:$host_port"
+    echo "${hostname}:$host_port"
     echo ""
     echo "Para parar o container:"
     echo "docker container stop $container_name"
