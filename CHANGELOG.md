@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Help considerando a linguagem do sistema
 * Criar um manual para ser usado no `man`
 
+## [0.1.1] 2022-05-23
+
+### Added
+
+### Changed
+
+### Fixed
+
+* Bug de testar o acesso à pasta data antes da criação (quando a pasta não existe).
+
 ## [0.1.0] - 2022-05-20
 
 ### Added
