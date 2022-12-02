@@ -9,7 +9,7 @@
 # É intenção futura poder escolher via opções onde colocar a pasta data.
 
 REPOLINK="https://github.com/kylefelipe/postgis_container_generator"
-version='0.1.1'
+version='0.1.2'
 database="meupostgis"
 hostname="localhost"
 container_name="meus-dados-geograficos"

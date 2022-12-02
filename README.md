@@ -9,7 +9,7 @@ As opções padrões do script são:
 
 - Nome do container = meus-dados-geográficos;  
 - Nome do banco = meupostgis;  
-- Porta do host = 5434;  
+- Porta do host = 5433;  
 - Root = postgres;  
 - Senha do root = postgres;  
 - Recria a pasta data: não;  

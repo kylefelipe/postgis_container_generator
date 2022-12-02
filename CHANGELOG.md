@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Help considerando a linguagem do sistema
 * Criar um manual para ser usado no `man`
 
+## [0.1.2] 2022-11-28
+
+### Changed
+
+* Versão do container docker do postgis para 15-3.3  
+* Porta padrão a ser utilizada pelo container no host para 5432  
+
 ## [0.1.1] 2022-05-23
 
 ### Added
