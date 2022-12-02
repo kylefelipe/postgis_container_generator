@@ -3,17 +3,17 @@
 # Author: Kyle Felipe
 # E-mail: kylefelipe at gmail.com
 # data: 18/07/2021
-# Ùltima atualização: 20/05/2022
+# Ùltima atualização: 28/11/2022
 # Script feito para criar um container com postgis e com a pasta data em um
 # local específico, a princípio é uma pasta data no diretório atual
 # É intenção futura poder escolher via opções onde colocar a pasta data.
 
 REPOLINK="https://github.com/kylefelipe/postgis_container_generator"
-version='0.1.0'
+version='0.1.1'
 database="meupostgis"
 hostname="localhost"
 container_name="meus-dados-geograficos"
-host_port="5434"
+host_port="5432"
 pg_password="postgres"
 pg_user="postgres"
 remove_data="n"
@@ -22,7 +22,7 @@ pg_pass="s"
 data_dir="$(pwd -P)"
 script_dir="$(pwd -P)/scripts"
 conf_dir="$(pwd -P)/conf"
-postgis_version="11-2.5"
+postgis_version="15-3.3"
 
 usage() {
     echo "Uso:  sudo create_postgis.sh [OPÇÃO]
